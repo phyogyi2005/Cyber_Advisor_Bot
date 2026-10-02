@@ -47,7 +47,7 @@ def get_gemini_response(prompt: str, system_instruction: str = "") -> str:
         raise RuntimeError("Google GenAI Python package is not installed.")
 
     # Only try active stable models
-    candidate_models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro']
+    candidate_models = ['gemini-3.1-flash-lite']
     last_exception = None
 
     for model_name in candidate_models:
