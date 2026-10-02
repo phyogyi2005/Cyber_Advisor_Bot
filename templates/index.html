@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Advisor | AI Security Assistant & Link Checker</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Marked.js for Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Style CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="clean-chat-body">
+
+    <!-- App Container Layout with Sidebar & Main Chat View -->
+    <div class="app-layout">
+        
+        <!-- SIDEBAR MENU & CHAT HISTORY PANEL -->
+        <aside class="sidebar-panel" id="sidebarPanel">
+            <div class="sidebar-header">
+                <div class="sidebar-brand">
+                    <i class="fa-solid fa-user-shield brand-icon-sm"></i>
+                    <span>Cyber Advisor</span>
+                </div>
+                <button class="icon-btn close-sidebar-btn" id="closeSidebarBtn" title="Close Sidebar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- New Chat Action Button -->
+            <div class="sidebar-action">
+                <button class="new-chat-btn" id="newChatBtn">
+                    <i class="fa-solid fa-plus"></i> New Chat
+                </button>
+            </div>
+
+            <!-- Chat History List -->
+            <div class="history-section">
+                <div class="history-section-title">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Chat History
+                </div>
+                <div class="history-list" id="historyList">
+                    <!-- Dynamic History Items -->
+                </div>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer">
+                <button class="sidebar-footer-btn" id="clearAllHistoryBtn">
+                    <i class="fa-solid fa-trash-can"></i> Clear All History
+                </button>
+            </div>
+        </aside>
+
+        <!-- Overlay backdrop for mobile screen collapse -->
+        <div class="sidebar-overlay hidden" id="sidebarOverlay"></div>
+
+
+        <!-- MAIN CHAT APP WRAPPER -->
+        <div class="chat-app-wrapper">
+            
+            <!-- Header -->
+            <header class="chat-app-header">
+                <div class="header-left">
+                    <button class="icon-btn sidebar-toggle-btn" id="sidebarToggleBtn" title="Toggle Sidebar Menu">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="app-info">
+                        <h2>Cyber Advisor</h2>
+                        <span class="status-indicator online" id="statusIndicator"><i class="fa-solid fa-circle"></i> AI Active</span>
+                    </div>
+                </div>
+
+                <!-- Mode Selector Pills -->
+                <div class="header-center">
+                    <div class="mode-pill-toggle">
+                        <button class="mode-pill active" data-mode="normal">
+                            <i class="fa-solid fa-message"></i> Normal Chat
+                        </button>
+                        <button class="mode-pill" data-mode="learning">
+                            <i class="fa-solid fa-graduation-cap"></i> Learning Mode
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Header Controls -->
+                <div class="header-right">
+                    <button class="icon-btn theme-toggle-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+                        <i class="fa-solid fa-moon" id="themeIcon"></i>
+                    </button>
+                </div>
+            </header>
+
+
+            <!-- Main Chat Messages Feed -->
+            <main class="chat-feed" id="chatFeed">
+                
+                <!-- Default Welcome Bubble -->
+                <div class="chat-row assistant-row">
+                    <div class="avatar assistant-avatar">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div class="bubble-box">
+                        <div class="bubble-meta">Cyber Advisor AI</div>
+                        <div class="markdown-body">
+                            Hello! 👋 I am Cyber Advisor, your personal AI Security Assistant.
+                            
+                            Ask me any cybersecurity question, paste code to inspect for vulnerabilities, or click Check URL Safety to scan links for phishing & malware threats!
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+
+            <!-- Inline Link Checker Tool Popup Modal -->
+            <div class="tool-modal-overlay hidden" id="linkToolModal">
+                <div class="tool-modal-box">
+                    <div class="modal-header">
+                        <h3><i class="fa-solid fa-link"></i> Scan URL Security</h3>
+                        <button class="close-modal-btn" id="closeToolModal"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="modal-desc">Paste a link to scan for Phishing, Typosquatting, and Domain threat risks:</p>
+                        <div class="modal-input-row">
+                            <input type="text" id="modalUrlInput" placeholder="https://example-suspicious-link.xyz..." autocomplete="off">
+                            <button id="modalScanBtn" class="modal-scan-btn"><i class="fa-solid fa-radar"></i> Scan</button>
+                        </div>
+                        
+                        <div class="modal-presets">
+                            <span>Quick Samples:</span>
+                            <button class="mini-preset-btn danger" data-url="http://185.220.101.5/paypaI-login.xyz/verify.php">Suspicious IP</button>
+                            <button class="mini-preset-btn warning" data-url="http://g00gle-security-verify.click?token=9a1b">Typosquatting</button>
+                            <button class="mini-preset-btn safe" data-url="https://github.com/security">Safe HTTPS</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Bottom Chat Input Box -->
+            <footer class="chat-input-container">
+                <div class="input-box-card">
+                    
+                    <!-- Tool Drawer Action Chips -->
+                    <div class="input-tools-bar">
+                        <button class="tool-action-btn" id="openLinkToolBtn">
+                            <i class="fa-solid fa-shield-virus"></i> Check URL Safety
+                        </button>
+                        <span class="tool-divider"></span>
+                        <button class="quick-chip" data-prompt="What are the best rules to prevent phishing attacks?">Phishing Tips</button>
+                        <button class="quick-chip" data-prompt="Explain SQL Injection and how to prevent it.">SQLi Defense</button>
+                    </div>
+
+                    <div class="input-field-row">
+                        <textarea id="chatInput" placeholder="Type a message or paste a URL..." rows="1"></textarea>
+                        <button id="sendBtn" class="send-btn">
+                            <i class="fa-solid fa-arrow-up"></i>
+                        </button>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/config.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
